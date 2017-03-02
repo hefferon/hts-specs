@@ -87,8 +87,11 @@ or
   {\tt MQ} & i & Mapping quality of the mate/next segment \\
   {\tt NH} & i & Number of reported alignments that contains the query in the current record \\
   {\tt NM} & i & Edit distance to the reference \\
-  {\tt OC} & Z & Original CIGAR \\
-  {\tt OP} & i & Original mapping position \\
+  {\tt OA} & Z & Original Alignment \\
+  {\tt OC} & Z & Original CIGAR 
+  (deprecated; use {\tt OA} instead) \\
+  {\tt OP} & i & Original mapping position 
+  (deprecated; use {\tt OA} instead) \\
   {\tt OQ} & Z & Original base quality \\
   {\tt OX} & Z & Original unique molecular barcode bases \\
   {\tt PG} & Z & Program \\
@@ -296,11 +299,23 @@ Deprecated alternative to {\tt BC} tag originally used at Sanger.
 \subsection{Original data}
 
 \begin{description}
+\item[OA:Z:\tagregex{{\tt (}\emph{rname}{\tt ,}\emph{pos}{\tt ,}\emph{strand}{\tt ,}\emph{CIGAR}{\tt ,}\emph{mapQ}{\tt ,}\emph{NM}{\tt ;)}+}]
+Original alignment of segment prior to realignment or unalignment by subsequent tool. 
+If any of the fields\' values (say {\tt NM}, or {\tt mapQ} etc.)\@ are unknown they may be omitted.
+However, comma delimiters must be retained so that text can be unambiguously parsed into the subfields.  
+In the presence of an existing {\tt OA} tag, a subsequent tool should append another set of original alignment information after the semicolon, 
+adding to---rather than replacing---the existing OA information. 
+
+Note 1: Since commas are legal characters in sequence names, the parsing 
+of the first field has to be done carefully. 
+
+Note 2: rname should be stated explicitly, not "=".
+Note 3: Strand should be '+' to indicate positive strand and "-" to indicate negative strand.
 \item[OC:Z:\tagvalue{cigar}]
-Original CIGAR, usually before realignment.
+Deprecated alternative to {\tt OA}. Original CIGAR, usually before realignment.
 
 \item[OP:i:\tagvalue{pos}]
-Original mapping position, usually before realignment.
+Deprecated alternative to {\tt OA}. Original mapping position, usually before realignment.
 
 \item[OQ:Z:\tagvalue{qualities}]
 Original base quality, usually before recalibration.
@@ -394,6 +409,7 @@ have been made while that version was current.
 
 \subsection*{1.5: 23 May 2013 to current}
 \begin{itemize}
+\item Add OA tag for recording original/previous alignment information. (September 2017)
 \item Add UMI-related tags (RX, QX, OX, BZ, MI) and clarified usage of sample barcode tag BC. (August 2017)
 \item SAMtags.txt (this file) created with tags from SAMv1 
 \end{itemize}
