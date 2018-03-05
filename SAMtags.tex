@@ -247,8 +247,21 @@ Free-text comments.
 \end{description}
 
 \subsection{Barcodes}
+DNA Barcodes can be used to identify the provenance of the underlying the reads. 
+There are currently several usages of barcodes that may co-exist: Sample Barcode, Cell Barcode, and Molecular-barcode.
+\begin{itemize}
+\item
+The sample barcode actually identifies the Library so that multiple libraries can be combined and sequenced together. 
+After sequencing, each barcode identifies the "readgroup" which is the assigned to the correct library and sample/individual.
+\item
+The cell barcode is similar to the sample barcode but the expectation is that every cell will be randomly assigned a barcode (whose content could be predetermined or random.)
+The cell barcode helps identify when reads came from different cell in a "single-cell" sequencing experiment. Unlike in Sample Barcode there is no control over which cell "gets" which barcode.
+\item
+The Molecular barcode can be used to identify the "original" molecule that is being replicated, so that duplicate marking isn't overzealous, or to identify the long molecule form which linked reads come from. 
+\end{itemize}
 
 \begin{description}
+
 \item[BC:Z:\tagvalue{sequence}]
 Barcode sequence (Identifying the sample/library), with any quality scores (optionally) stored in the {\tt QT} tag.
 The {\tt BC} tag should match the {\tt QT} tag in length. 
