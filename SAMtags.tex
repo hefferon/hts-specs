@@ -253,7 +253,7 @@ There are currently three varieties of barcodes that may co-exist: Sample Barcod
 \item
 Despite its name, the {\it Sample} Barcode identifies the {\it Library} and allows multiple libraries to be combined and sequenced together.
 After sequencing, the reads can be separated according to this barcode and placed in different ``read groups'' each corresponding to a library.
-Since the library was generated from a sample, knowing the library should inform of the sample. 
+Since the library was generated from a sample, knowing the library should inform of the sample.
 The barcode itself can be included in the {\tt PU} field in the {\tt RG} header line.
 Since the PU field should be globally unique, it is advisable to also include specific information such as flowcell barcode and lane.
 The {\tt ID} field of the {\tt RG} header line is not an appropriate place for the barcode as it is treated as mutable by several tools as it might be modified, for example when merging files.
@@ -263,7 +263,7 @@ The {\it Cell} Barcode is similar to the sample barcode but there is (normally) 
 The Cell Barcode helps identify when reads come from different cells in a ``single-cell'' sequencing experiment.
 
 \item
-The UMI is intended to identify the molecule (single- or double-stranded) at the time that the barcode was introduced. 
+The UMI is intended to identify the molecule (single- or double-stranded) at the time that the barcode was introduced.
 This can be used to inform duplicate marking and consensus calling in ultra-deep sequencing and in the presence of ``sister'' duplicates (templates from opposite strands of the same double-stranded molecule).
 It can also be used to (informatically) link reads that were generated from the same long molecule.
 \end{itemize}
@@ -288,7 +288,7 @@ In the case of multiple unique molecular identifiers (e.g., one on each end of t
 If the bases represent corrected bases, the original sequence can be stored in {\tt OX} (similar to {\tt OQ} storing the original qualities of bases.)
 
 \item[QX:Z:\tagvalue{qualities+}] 
-Phred quality of the Unique Molecular Identifier sequence in the {\tt RX} tag. 
+Phred quality of the Unique Molecular Identifier sequence in the {\tt RX} tag.
 Same encoding as {\sf QUAL}, i.e., Phred score + 33.
 The qualities here may have been corrected (Raw bases and qualities can be stored in {\tt OX} and {\tt BZ} respectively.)
 The lengths of the {\tt QX} and the {\tt RX} tags must match. 
