@@ -271,8 +271,8 @@ It can also be used to (informatically) link reads that were generated from the 
 \begin{description}
 \item[BC:Z:\tagvalue{sequence}]
 Barcode sequence (Identifying the sample/library), with any quality scores (optionally) stored in the {\tt QT} tag.
-The {\tt BC} tag should match the {\tt QT} tag in length.
-In the case of multiple unique molecular identifiers (e.g., one on each end of the template) the recommended implementation concatenates all the barcodes and places a hyphen (`{\tt -}') between the barcodes from the same template.
+The {\tt BC} tag should match the {\tt QT} tag in length. 
+In the case of multiple unique molecular identifiers (e.g., one on each end of the template) the recommended implementation concatenates all the barcodes and places a hyphen (`{\tt -}') between the barcodes from the same template. 
 
 \item[QT:Z:\tagvalue{qualities}] 
 Phred quality of the sample-barcode sequence in the {\tt BC} (or {\tt RT}) tag. 
