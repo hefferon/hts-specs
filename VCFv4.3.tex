@@ -501,16 +501,7 @@ For precise variants, the consensus sequence the alternate allele assembly is de
 ##FORMAT=<ID=AHAP,Number=1,Type=Integer,Description="Unique identifier of ancestral haplotype">
 \end{verbatim}
 \normalsize
-These keys are analogous to GT/GQ/GL/GP and are provided for genotyping
-imprecise events by copy number (either because there is an unknown number of
-alternate alleles or because the haplotypes cannot be determined). CN specifies
-the integer copy number of the variant in this sample. CNQ is encoded as a
-phred quality $-10log_{10}$ p(copy number genotype call is wrong). CNL
-specifies a list of $log_{10}$ likelihoods for each potential copy number,
-starting from zero. CNP is 0 to 1-scaled copy number posterior
-probabilities (and otherwise defined precisely as the CNL field), intended to
-store imputed genotype probabilities. When possible, GT/GQ/GL/GP should be used
-instead of (or in addition to) these keys.
+These keys are analogous to GT/GQ/GL/GP and are provided for genotyping imprecise events by copy number (either because there is an unknown number of alternate alleles or because the haplotypes cannot be determined). CN specifies the integer copy number of the variant in this sample. CNQ is encoded as a phred quality $-10log_{10}$ p(copy number genotype call is wrong). CNL specifies a list of $log_{10}$ likelihoods for each potential copy number, starting from zero. CNP is 0 to 1-scaled copy number posterior probabilities (and otherwise defined precisely as the CNL field), intended to store imputed genotype probabilities. When possible, GT/GQ/GL/GP should be used instead of (or in addition to) these keys.
 
 \section{Representing variation in VCF records}
 \subsection{Creating VCF entries for SNPs and small indels}
@@ -1172,13 +1163,7 @@ Haplotype quality & 30 & 40 & 40 \\
 \end{tabular}
 
 \subsection{Representing unspecified alleles and REF-only blocks (gVCF)}
-In order to report sequencing data evidence for both variant and non-variant
-positions in the genome, the VCF specification allows to represent blocks of reference-only calls in a single record
-using the END INFO tag, an idea originally introduced by the gVCF file format\footnote{\url{https://help.basespace.illumina.com/articles/descriptive/gvcf-files/}}.
-The convention adopted here is to represent reference evidence as likelihoods against an
-unknown alternate allele. Think of this as the likelihood for reference as compared to any other possible alternate
-allele (both SNP, indel, or otherwise). A symbolic alternate allele $<$*$>$
-is used to represent this unspecified alternate allele.
+In order to report sequencing data evidence for both variant and non-variant positions in the genome, the VCF specification allows to represent blocks of reference-only calls in a single record using the END INFO tag, an idea originally introduced by the gVCF file format\footnote{\url{https://help.basespace.illumina.com/articles/descriptive/gvcf-files/}}. The convention adopted here is to represent reference evidence as likelihoods against an unknown alternate allele. Think of this as the likelihood for reference as compared to any other possible alternate allele (both SNP, indel, or otherwise). A symbolic alternate allele $<$*$>$ is used to represent this unspecified alternate allele.
 
 Example records are given below:
 \scriptsize
