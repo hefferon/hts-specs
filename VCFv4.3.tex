@@ -1184,62 +1184,30 @@ Example records are given below:
 \pagebreak
 \section{BCF specification}
 
-VCF is very expressive, accommodates multiple samples, and is widely used
-in the community.  Its biggest drawback is that it is big and slow.
-Files are text and therefore require a lot of space on disk.  A normal batch
-of a hundred exomes is a few GB, but large-scale VCFs with thousands of exome
-samples quickly become hundreds of GBs.  Because the file is text, it is
-extremely slow to parse.
+VCF is very expressive, accommodates multiple samples, and is widely used in the community. Its biggest drawback is that it is big and slow. Files are text and therefore require a lot of space on disk. A normal batch of a hundred exomes is a few GB, but large-scale VCFs with thousands of exome samples quickly become hundreds of GBs. Because the file is text, it is extremely slow to parse.
 
-Overall, the idea behind is BCF2 is simple.  BCF2 is a binary, compressed
-equivalent of VCF that can be indexed with tabix and can be efficiently decoded
-from disk or streams.  For efficiency reasons BCF2 only supports a subset
-of~VCF, in that all info and genotype fields must have their full types
-specified.  That is, BCF2 requires that if e.g. an info field {\tt AC} is
-present then it must contain an equivalent VCF header line noting that {\tt AC}
-is an allele indexed array of type integer.
+Overall, the idea behind is BCF2 is simple.  BCF2 is a binary, compressed equivalent of VCF that can be indexed with tabix and can be efficiently decoded from disk or streams. For efficiency reasons BCF2 only supports a subset of VCF, in that all info and genotype fields must have their full types specified. That is, BCF2 requires that if e.g. an info field {\tt AC} is present then it must contain an equivalent VCF header line noting that {\tt AC} is an allele indexed array of type integer.
 
 \subsection{Overall file organization}
 
-A BCF2 file is composed of a mandatory header, followed by a series of BGZF
-compressed blocks of binary BCF2 records.  The BGZF blocks allow BCF2 files
-to be indexed with tabix.
+A BCF2 file is composed of a mandatory header, followed by a series of BGZF compressed blocks of binary BCF2 records. The BGZF blocks allow BCF2 files to be indexed with tabix.
 
-BGZF blocks are composed of a VCF header with a few additional records and a
-block of records.  Following the last BGZF BCF2 record block is an empty
-BGZF block (a block containing zero type of data), indicating that the
-records are done.
+BGZF blocks are composed of a VCF header with a few additional records and a block of records. Following the last BGZF BCF2 record block is an empty BGZF block (a block containing zero type of data), indicating that the records are done.
 
-A BCF2 header follows exactly the specification as VCF, with a few
-extensions/restrictions:
+A BCF2 header follows exactly the specification as VCF, with a few extensions/restrictions:
 \begin{itemize}
-\item All BCF2 files must have fully specified contigs definitions.
-No record may refer to a contig not present in the header itself.
+\item All BCF2 files must have fully specified contigs definitions. No record may refer to a contig not present in the header itself.
 
-\item All INFO and GENOTYPE fields must be fully typed in the BCF2 header to
-enable type-specific encoding of the fields in records.  An error must be
-thrown when converting a VCF to BCF2 when an unknown or not fully specified
-field is encountered in the records.
+\item All INFO and GENOTYPE fields must be fully typed in the BCF2 header to enable type-specific encoding of the fields in records.  An error must be thrown when converting a VCF to BCF2 when an unknown or not fully specified field is encountered in the records.
 \end{itemize}
 
 \subsection{Header}
 
-The BCF2 header begins with the ``BCF2 magic'' 5 bytes that encode
-{\tt BCF\em XY} where {\em X} and {\em Y} are bytes indicating the major
-number (currently 2) and the minor number (currently 2).  This magic can be
-used to quickly examine the file to determine that it's a BCF2 file.
-Immediately following the BCF2 magic is the standard VCF header lines in text
-format, beginning with \verb|##fileformat=VCFvX.Y|.  Because the type is
-encoded directly in the header, the recommended extension for BCF2 formatted
-files is {\sl .bcf}.  BCF2 supports encoding values in a dictionary of strings.
-The string map is provided by the keyword \verb|##dictionary=S0,S1,...,SN| as a
-comma-separate ordered list of strings.  See the ``Dictionary of strings''
-section for more details.
+The BCF2 header begins with the ``BCF2 magic'' 5 bytes that encode {\tt BCF\em XY} where {\em X} and {\em Y} are bytes indicating the major number (currently 2) and the minor number (currently 2). This magic can be used to quickly examine the file to determine that it's a BCF2 file. Immediately following the BCF2 magic is the standard VCF header lines in text format, beginning with \verb|##fileformat=VCFvX.Y|.  Because the type is encoded directly in the header, the recommended extension for BCF2 formatted files is {\sl .bcf}.  BCF2 supports encoding values in a dictionary of strings. The string map is provided by the keyword \verb|##dictionary=S0,S1,...,SN| as a comma-separate ordered list of strings.  See the ``Dictionary of strings'' section for more details.
 
 \subsubsection{Dictionary of strings}
 
-Throughout the BCF file most string values are be specified by integer
-reference to their dictionary values.  For example, the following VCF record:
+Throughout the BCF file most string values are be specified by integer reference to their dictionary values.  For example, the following VCF record:
 \small
 \begin{verbatim}
 ##INFO=<ID=ASP,Number=0,Type=Flag,Description="X">
@@ -1265,15 +1233,8 @@ would be encoded inline in BCF2 by reference to the relative position of the hea
 \end{verbatim}
 \normalsize
 
-Defined this way, the dictionary of strings depends on the order and the
-presence of all preceding header lines. If an existing tag needs to be removed
-from a BCF, also all consequent tags throughout the whole BCF would have to be
-recoded. In order to avoid this costly operation, a new IDX field can be used
-to explicitly define the position which is dropped on BCF-to-VCF conversion. If
-not present, the implicit relative position is assumed. If the IDX field is
-present in one record, it must be present also in all other dictionary-defining
-records. The IDX tag is not necessary in newly created BCF files, but if
-present, the numbering must match the implicit dictionary of tags.
+Defined this way, the dictionary of strings depends on the order and the presence of all preceding header lines. If an existing tag needs to be removed from a BCF, also all consequent tags throughout the whole BCF would have to be recoded. In order to avoid this costly operation, a new IDX field can be used to explicitly define the position which is dropped on BCF-to-VCF conversion. If
+not present, the implicit relative position is assumed. If the IDX field is present in one record, it must be present also in all other dictionary-defining records. The IDX tag is not necessary in newly created BCF files, but if present, the numbering must match the implicit dictionary of tags.
 
 Note that the dictionary encoding has the magic prefix `s' here to indicate that the field's value is actually in the dictionary entry giving by the subsequent offset.  This representation isn't actually the one used in BCF2 records but it provides a clean visual guide for the above example.  Note also how the contig has been recoded as a offset into the list of contig declarations.
 
@@ -1300,13 +1261,7 @@ the actual CHROM field values in the encoded BCF2 records would be 0, 1, and 2 c
 
 \subsection{BCF2 records}
 
-
-In BCF2, the original VCF records are converted to binary and encoded as BGZF
-blocks.  Each record is conceptually two parts.  First is the site information
-(chr, pos, INFO field).  Immediately after the sites data is the genotype data
-for every sample in the BCF2 file.  The genotype data may be omitted entirely
-from the record if there is no genotype data in the VCF file. 
-Compression of a BCF file is recommended but not required.
+In BCF2, the original VCF records are converted to binary and encoded as BGZF blocks. Each record is conceptually two parts. First is the site information (chr, pos, INFO field).  Immediately after the sites data is the genotype data for every sample in the BCF2 file.  The genotype data may be omitted entirely from the record if there is no genotype data in the VCF file. Compression of a BCF file is recommended but not required.
 
 \subsubsection{Site encoding}
 
@@ -1403,43 +1358,21 @@ Note this is not used in BCF2, but its type is reserved in case this becomes nec
 
 \vspace{0.3cm}
 
-\textbf{Integers} may be encoded as 8, 16, or 32 bit values, in little-endian
-order.  It is up to the encoder to determine the appropriate ranged value to
-use when writing the BCF2 file. 
-For integer types, the values 0x80, 0x8000, 0x80000000 are interpreted as
-missing values and 0x81, 0x8001, 0x80000001 as end-of-vector indicators
-(for 8, 16, and 32 bit values, respectively). Note that the end-of-vector byte
-is not part of the vector itself and only end-of-vector bytes can follow.
-In total, eight values are reserved for future use: 0x80-0x87, 0x8000-0x8007, 0x80000000-0x80000007.
-
+\textbf{Integers} may be encoded as 8, 16, or 32 bit values, in little-endian order. It is up to the encoder to determine the appropriate ranged value to use when writing the BCF2 file. For integer types, the values 0x80, 0x8000, 0x80000000 are interpreted as
+missing values and 0x81, 0x8001, 0x80000001 as end-of-vector indicators (for 8, 16, and 32 bit values, respectively). Note that the end-of-vector byte is not part of the vector itself and only end-of-vector bytes can follow. In total, eight values are reserved for future use: 0x80-0x87, 0x8000-0x8007, 0x80000000-0x80000007.
 
 \vspace{0.3cm}
-\textbf{Floats} are encoded as single-precision (32 bit) in the basic format
-defined by the IEEE-754-1985 standard.  This is the standard representation for
-floating point numbers on modern computers, with direct support in programming
-languages like C and Java (see Java's Double class for example).  BCF2 supports
-the full range of values from -Infinity to +Infinity, including NaN.  BCF2
-needs to represent missing values for single precision floating point numbers.
-This is accomplished by writing the NaN value as the quiet NaN (qNaN), while
-the MISSING value is encoded as a signaling NaN.  From the NaN wikipedia entry,
-we have:
+\textbf{Floats} are encoded as single-precision (32 bit) in the basic format defined by the IEEE-754-1985 standard. This is the standard representation for floating point numbers on modern computers, with direct support in programming languages like C and Java (see Java's Double class for example). BCF2 supports the full range of values from -Infinity to +Infinity, including NaN. BCF2
+needs to represent missing values for single precision floating point numbers. This is accomplished by writing the NaN value as the quiet NaN (qNaN), while the MISSING value is encoded as a signaling NaN. From the NaN wikipedia entry, we have:
 
 \begin{quote}
-For example, a bit-wise example of a IEEE floating-point standard single
-precision (32-bit) NaN would be: s111 1111 1axx xxxx xxxx xxxx xxxx xxxx where
-s is the sign (most often ignored in applications), a determines the type of
-NaN, and x is an extra payload (most often ignored in applications).  If a = 1,
-it is a quiet NaN; if a is zero and the payload is nonzero, then it is a
-signaling NaN.
+For example, a bit-wise example of a IEEE floating-point standard single precision (32-bit) NaN would be: s111 1111 1axx xxxx xxxx xxxx xxxx xxxx where s is the sign (most often ignored in applications), a determines the type of NaN, and x is an extra payload (most often ignored in applications).  If a = 1, it is a quiet NaN; if a is zero and the payload is nonzero, then it is a signaling NaN.
 \end{quote}
 
 \noindent A good way to understand these values is to play around with the IEEE encoder webiste.
 
 \vspace{0.3cm}
-\noindent Similarly to integers, the float value of 0x7F800001 is interpreted as a missing value
-and 0x7F800002 as the end-of-vector indicator. Note that the end-of-vector byte
-is not part of the vector itself and only end-of-vector bytes can follow. In total,
-eight values are reservd for future use:
+\noindent Similarly to integers, the float value of 0x7F800001 is interpreted as a missing value and 0x7F800002 as the end-of-vector indicator. Note that the end-of-vector byte is not part of the vector itself and only end-of-vector bytes can follow. In total, eight values are reservd for future use:
 
 \vspace{0.1cm}
 \begin{tabular}{| l | c | l |} \hline
@@ -1482,14 +1415,7 @@ Suppose you want to encode the string MarkDePristoWorksAtTheBroad, a string of s
 Suppose you want to encode the missing value `.'.  This is simply a string of size 0 = 0x07.
 
 \vspace{0.3cm}
-In VCF there are sometimes fields of type list of strings, such as a number
-field of unbounded size encoding the amino acid changes due to a mutation.
-Since BCF2 doesn't directly support vectors of strings (a vector of character
-is already a string) we collapse the list of strings into a single
-comma-separated string, encode it as a regular BCF2 vector of characters, and
-on reading explode it back into the list of strings.  This works because
-strings in VCF cannot contain `{ \tt ,}' (it's a field separator) and so we can
-safely use `{\tt ,}' to separate the individual strings. 
+In VCF there are sometimes fields of type list of strings, such as a number field of unbounded size encoding the amino acid changes due to a mutation. Since BCF2 doesn't directly support vectors of strings (a vector of character is already a string) we collapse the list of strings into a single comma-separated string, encode it as a regular BCF2 vector of characters, and on reading explode it back into the list of strings.  This works because strings in VCF cannot contain `{ \tt ,}' (it's a field separator) and so we can safely use `{\tt ,}' to separate the individual strings. 
 
 % String vectors in BCF do not need to start with comma, as the number of
 % values is indicated already in the definition of the tag in the header.
@@ -1509,9 +1435,7 @@ safely use `{\tt ,}' to separate the individual strings.
 
 Missing values in vectors are handled slightly differently from atomic values.  There are two possibilities for missing values:
 
-One (or more) of the values in the vector may be missing, but others in the vector are not.  Here each value should be represented in the vector, and each corresponding BCF2 vector value either set to its present value or the type equivalent MISSING value.
-Alternatively the entire vector of values may be missing.  In this case the correct encoding is as a type byte with size 0 and the appropriate type MISSING.
-Suppose we are encoding the record ``AC=[1,2,3]'' from the INFO field.  The AC key is encoded in the standard way.  This would be immediately followed by a typed 8-bit integer vector of size 3, which is encoded by the type descriptor 0x31.  The type descriptor is immediately followed by the three 8-bit integer values: 0x01 0x02 0x03, for a grant total of 4 bytes: 0x31010203.
+One (or more) of the values in the vector may be missing, but others in the vector are not.  Here each value should be represented in the vector, and each corresponding BCF2 vector value either set to its present value or the type equivalent MISSING value. Alternatively the entire vector of values may be missing.  In this case the correct encoding is as a type byte with size 0 and the appropriate type MISSING. Suppose we are encoding the record ``AC=[1,2,3]'' from the INFO field.  The AC key is encoded in the standard way.  This would be immediately followed by a typed 8-bit integer vector of size 3, which is encoded by the type descriptor 0x31.  The type descriptor is immediately followed by the three 8-bit integer values: 0x01 0x02 0x03, for a grant total of 4 bytes: 0x31010203.
 
 Suppose we are at a site with many alternative alleles so AC=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].  Since there are 16 values, we have to use the long vector encoding.  The type of this field is 8 bit integer with the size set to 15 to indicate that the size is the next stream value, so this has type of 0xF1.  The next value in the stream is the size, as a typed 8-bit atomic integer: 0x11 with value 16 0x10.  Each integer AC value is represented by it's value as a 8 bit integer.  The grand total representation here is:
 
@@ -1541,14 +1465,7 @@ For example, suppose I have two samples, each with a FORMAT field X.  Sample A h
 Note that this means that it's illegal to encode a vector VCF field with missing values; the BCF2 codec should signal an error in this case.
 
 \vspace{0.3cm}
-A \textbf{Genotype (GT) field} is encoded in a typed integer vector (can be 8,
-16, or even 32 bit if necessary) with the number of elements equal to the
-maximum ploidy among all samples at a site.  For one individual, each integer
-in the vector is organized as $(allele+1) << 1 \mid phased$ where allele is set
-to -1 if the allele in GT is a dot `.' (thus the higher bits are all 0).  
-The vector is padded with the end-of-vector values if the GT having fewer ploidy.
-We note specifically that except for the end-of-vector byte, no other negative
-values are allowed in the GT array.
+A \textbf{Genotype (GT) field} is encoded in a typed integer vector (can be 8, 16, or even 32 bit if necessary) with the number of elements equal to the maximum ploidy among all samples at a site.  For one individual, each integer in the vector is organized as $(allele+1) << 1 \mid phased$ where allele is set to -1 if the allele in GT is a dot `.' (thus the higher bits are all 0). The vector is padded with the end-of-vector values if the GT having fewer ploidy. We note specifically that except for the end-of-vector byte, no other negative values are allowed in the GT array.
 
 Examples:
 
@@ -1576,12 +1493,9 @@ The final example is something seen on chrX when we have a haploid male and a di
 A type byte value of 0x00 is an allowed special case meaning MISSING but without an explicit type provided.
 
 
-
 \subsection{Encoding a VCF record example}
 
-Let's encode a realistic (but made-up) VCF record.  This is a A/C SNP in HM3
-(not really) called in~3 samples.  In this section we'll build up the BCF2
-encoding for this record.
+Let's encode a realistic (but made-up) VCF record.  This is a A/C SNP in HM3 (not really) called in~3 samples.  In this section we'll build up the BCF2 encoding for this record.
 \scriptsize
 \begin{verbatim}
 #CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA00001 NA00002 NA00003
@@ -1591,13 +1505,7 @@ chr1 101 rs123 A C 30.1 PASS HM3;AC=3;AN=6;AA=C GT:GQ:DP:AD:PL 0/0:10:32:32,0:0,
 
 \subsubsection{Encoding CHROM and POS}
 
-First, let's assume that {\tt chr1} is the second chromosome to appear in the
-contig list---right after {\tt chrM} ({\tt MT}).  So its offset is~1.
-The {\tt POS} BCF2 field value is~101 (obviously).  Because these are both
-typed values in the BCF2 record, we encode both in their most compact 8-bit
-value form.  The type byte for an atomic 8-bit integer is 0x11.  The value for
-the contig offset is 1 = 0x01.  The value 101 is encoded as the single byte
-0x65.  So in total these are represented as:
+First, let's assume that {\tt chr1} is the second chromosome to appear in the contig list---right after {\tt chrM} ({\tt MT}).  So its offset is 1. The {\tt POS} BCF2 field value is~101 (obviously). Because these are both typed values in the BCF2 record, we encode both in their most compact 8-bit value form.  The type byte for an atomic 8-bit integer is 0x11. The value for the contig offset is 1 = 0x01. The value 101 is encoded as the single byte 0x65. So in total these are represented as:
 
 \vspace{0.3cm}
 \begin{tabular}{|l | l|} \hline
@@ -1618,9 +1526,8 @@ The QUAL field value is 30.1, which we encode as an untyped single precision
 
 \subsubsection{Encoding ID}
 
-For ID type byte would is a 5-element string (type descriptor 0x59),
-which would then be followed by the five bytes for the string of
-{\tt 0x72 0x73 0x31 0x32 0x33}.  The full encoding is:
+For ID type byte would is a 5-element string (type descriptor 0x59), which would then be followed by the five bytes for the string of
+{\tt 0x72 0x73 0x31 0x32 0x33}. The full encoding is:
 
 \vspace{0.3cm}
 \begin{tabular}{|l| l|} \hline
@@ -1629,9 +1536,7 @@ which would then be followed by the five bytes for the string of
 
 \subsubsection{Encoding REF/ALT fields}
 
-We encode each of REF and ALT as typed strings, first REF followed immediately
-by ALT.  Each is a 1 element string (0x17), which would then be followed by the
-single bytes for the bases of 0x43 and 0x41:
+We encode each of REF and ALT as typed strings, first REF followed immediately by ALT. Each is a 1 element string (0x17), which would then be followed by the single bytes for the bases of 0x43 and 0x41:
 
 \vspace{0.3cm}
 \begin{tabular}{|l| l|} \hline
@@ -1694,8 +1599,7 @@ GT:GQ:DP:AD:PL & 0/0:10:32:32,0:0,10,100 & 0/1:10:48:32,16:10,0,100 & 1/1:10:64:
 \end{tabular}
 \vspace{0.3cm}
 
-Here we have the specially encoded GT field.  We have two integer fields GQ and DP.  We have the AD field, which is a vector of 2 values per sample.  And finally we have the PL field which is 3 values per sample.  Let's say that the FORMAT keys for GT, GQ, DP, AD, and PL are at offsets 1, 2, 3, and 4, 5, respectively.
-Now let's encode each of the genotype fields in order of the VCF record (GT, GQ, DP, AD, and then PL):
+Here we have the specially encoded GT field.  We have two integer fields GQ and DP.  We have the AD field, which is a vector of 2 values per sample.  And finally we have the PL field which is 3 values per sample.  Let's say that the FORMAT keys for GT, GQ, DP, AD, and PL are at offsets 1, 2, 3, and 4, 5, respectively. Now let's encode each of the genotype fields in order of the VCF record (GT, GQ, DP, AD, and then PL):
 
 GT triplet begins with the key: 0x1101.  Next is the type of the field, which will be a 2-element (diploid) INT8 type: 0x21.  This is followed by 3 2-byte arrays of values 0x0202 0x0204 0x0404 (see genotype encoding example for details).  The final encoding is 0x1101 0x21 0x020202040404
 
@@ -1765,24 +1669,16 @@ That's quite a lot of information encoded in only 96 bytes!
 
 \subsection{BCF2 block gzip and indexing}
 
-These raw binary records may be subsequently encoded into BGZF blocks following
-the BGZF compression format, section 3 of the SAM format specification.
-BCF2 records can be raw, though, in cases where the decoding/encoding costs of
-bgzipping the data make it reasonable to process the data uncompressed, such as
-streaming BCF2s through pipes with samtools and bcftools.  Here the files
-should be still compressed with BGZF but with compression 0.  Note that
-currently the GATK generates raw BCF2 files (not BGZF compression at all) but
-this will change in the near future.
+These raw binary records may be subsequently encoded into BGZF blocks following the BGZF compression format, section 3 of the SAM format specification. BCF2 records can be raw, though, in cases where the decoding/encoding costs of bgzipping the data make it reasonable to process the data uncompressed, such as streaming BCF2s through pipes with samtools and bcftools. Here the files should be still compressed with BGZF but with compression 0. Note that currently the GATK generates raw BCF2 files (not BGZF compression at all) but this will change in the near future.
 
-BCF2 files are expected to be indexed through the same index scheme,
-section~4 as BAM files and other block-compressed files with BGZF.
+BCF2 files are expected to be indexed through the same index scheme, section~4 as BAM files and other block-compressed files with BGZF.
 
 \section{List of changes}
 
 \subsection{Changes to VCFv4.3}
 
 \begin{itemize}
-\item More strict language: "should" replaced with "must" where appropriate
+\item More strict language: "should" replaced with "must" where appropriate 
 \item Tables with Type and Number definitions for INFO and FORMAT reserved keys
 \end{itemize}
 
